@@ -1,5 +1,28 @@
 const { ApolloServer, gql } = require('apollo-server');
 
+const randomBetween = (min, max) => {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+const buildArr = (numbersAmount, min, max) => {
+  const numbers = Array(numbersAmount)
+    .fill(0)
+    .map(_ => parseInt(randomBetween(min, max), 10));
+
+  return numbers;
+}
+
+const users = [
+  {
+    id: 1,
+    name: 'user',
+    email: 'user@email',
+    age: 1,
+    real_wage: 1.10,
+    logged: true,
+  },
+];
+
 const typeDefs = gql`
   scalar Date
 
@@ -17,9 +40,12 @@ const typeDefs = gql`
   # entrypoints of the API
   # "!" is to make this parameters mandatory
   type Query {
-    ola: String!
-    dataHora: Date
+    hello: String!
+    dateHour: Date
     loggedUser: User
+    # an array of integers mandatory, but it can be empty
+    randomUniqueNumbers: [Int]!
+    users: [User]!
   }
 `;
 
@@ -30,14 +56,14 @@ const resolvers = {
       return user.real_wage;
     },
     testStr() {
-      return `Str ${Math.floor(Math.random() * (100 - 10 + 1) + 10)}`;
+      return `Str ${randomBetween(10, 100)}`;
     },
   },
   Query: {
-    ola() {
+    hello() {
       return 'Hello World';
     },
-    dataHora() {
+    dateHour() {
       return new Date(Date.now()).toISOString();
     },
     loggedUser() {
@@ -47,10 +73,28 @@ const resolvers = {
         email: 'user@email',
         age: 1,
         real_wage: 1.10,
-        logged: true
+        logged: true,
       };
-    }
-  }
+    },
+    randomUniqueNumbers() {
+      const [min, max] = [10, 100];
+      const numbers = buildArr(10, min, max);
+      
+      let unique = [...new Set(numbers)];
+      if (unique.length !== 10) {
+        const diff = (10 - unique.length);
+        console.log(diff); // eslint-disable-line
+
+        unique = [...unique, ...buildArr(diff, min, max)];
+      }
+
+      return unique
+        .sort((a, b) => a - b); // crescent order;
+    },
+    users() {
+      return users;
+    },
+  },
 };
 
 const server = new ApolloServer({
@@ -67,8 +111,12 @@ server.listen({ host: '0.0.0.0', port: 4000 }).then(({ url }) => {
 query
 {
   ola
-  dataHora
+  dateHour
   loggedUser {
+    id name email age wage logged testStr
+  }
+  randomUniqueNumbers
+  users {
     id name email age wage logged testStr
   }
 }
