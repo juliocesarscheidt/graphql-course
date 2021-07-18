@@ -1,0 +1,26 @@
+version: '3.4'
+
+services:
+  app:
+    command: 'sh -c "yarn install && yarn run dev"'
+    container_name: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      APP_PORT: ${APP_PORT:-4000}
+    networks:
+      - subnet_0
+    restart: on-failure
+    ports:
+      - 4000:4000
+    volumes:
+      - ./:/app:rw
+      - app-node-modules:/app/node_modules:rw
+
+networks:
+  subnet_0:
+    driver: bridge
+
+volumes:
+  app-node-modules: {}
