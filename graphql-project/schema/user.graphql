@@ -1,0 +1,11 @@
+type User {
+  id: Int
+  name: String!
+  email: String!
+  age: Int
+  finalWage: Float
+  logged: Boolean
+  randomString: String
+  profileId: Int
+  profile: Profile
+}

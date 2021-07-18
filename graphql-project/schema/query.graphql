@@ -1,0 +1,16 @@
+# custom scalar type
+scalar Date
+
+# entrypoints of the API
+# "!" is to make this parameters mandatory
+type Query {
+  hello: String!
+  dateHour: Date
+  loggedUser: User
+  # an array of integers mandatory, but it can be empty
+  randomUniqueNumbers: [Int]!
+  user(id: Int): User
+  users: [User]!
+  profile(id: Int): Profile
+  profiles: [Profile]!
+}
