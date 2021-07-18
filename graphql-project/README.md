@@ -21,6 +21,7 @@ fragment fullUserData on User {
   randomString
   profileId
   profile { ...fullProfileData }
+  status
 }
 
 query

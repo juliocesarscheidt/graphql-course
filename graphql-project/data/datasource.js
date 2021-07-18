@@ -7,6 +7,7 @@ const users = [
     realWage: 1500.90,
     logged: true,
     profileId: 1,
+    status: 'ACTIVE',
   }, {
     id: 2,
     name: 'user2',
@@ -15,6 +16,7 @@ const users = [
     realWage: 2500.90,
     logged: true,
     profileId: 2,
+    status: 'INACTIVE',
   },
 ];
 
