@@ -24,8 +24,7 @@ fragment fullUserData on User {
   status
 }
 
-query
-{
+query {
   # hello
   dateHour
   # loggedUser { ...fullUserData }
@@ -34,5 +33,14 @@ query
   # users { ...fullUserData }
   profile(id: 1) { ...fullProfileData }
   # profiles { ...fullProfileData }
+}
+
+// Mutation examples:
+mutation {
+  createUser(
+    name:"Test"
+    email: "test@mail.com"
+    age: 25
+  ) { ...fullUserData }
 }
 ```

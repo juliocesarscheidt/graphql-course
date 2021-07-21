@@ -1,12 +1,18 @@
-class MathHandler {
+class ArrayMathUtils {
   constructor() {
-    console.log('Creating MathHandler instance');
+    console.log('Creating ArrayMathUtils instance');
   }
 
   toInt(value, base = 10) {
     return value !== undefined && !isNaN(value) ?
       parseInt(value, base) :
       0;
+  }
+
+  toFloat(value) {
+    return value !== undefined && !isNaN(value) ?
+      parseFloat(value).toFixed(2) :
+      0.00;
   }
 
   randomBetween (min, max) {
@@ -42,4 +48,4 @@ class MathHandler {
   }
 }
 
-module.exports = MathHandler;
+module.exports = ArrayMathUtils;

@@ -1,17 +1,17 @@
 const { profiles } = require('../data/datasource');
-const MathHandler = require('../utils/MathHandler');
+const ArrayMathUtils = require('../utils/ArrayMathUtils');
 
 // init instances
-const mathHandler = new MathHandler();
+const arrayMathUtils = new ArrayMathUtils();
 
 module.exports = {
   finalWage(user) {
-    // console.log(user);
+    console.log('user.realWage', user.realWage);
     const taxesAndFees = 0.05;
     return (user.realWage - (user.realWage * taxesAndFees)).toFixed(2);
   },
   randomString() {
-    return `Str ${mathHandler.randomBetween(10, 100)}`;
+    return `Str ${arrayMathUtils.randomBetween(10, 100)}`;
   },
   profile({ profileId }) {
     return profiles.filterByID(profileId);

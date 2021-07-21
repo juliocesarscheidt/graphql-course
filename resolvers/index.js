@@ -1,7 +1,13 @@
+const User = require('./user');
+const Profile = require('./profile');
+const Query = require('./query');
+const Mutation = require('./mutation');
+
 const resolvers = {
-  User: require('./user'),
-  Profile: require('./profile'),
-  Query: require('./query'),
+  User,
+  Profile,
+  Query,
+  Mutation,
 };
 
 module.exports = resolvers;

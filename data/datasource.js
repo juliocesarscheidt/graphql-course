@@ -1,24 +1,10 @@
-const users = [
-  {
-    id: 1,
-    name: 'user1',
-    email: 'user1@email',
-    age: 1,
-    realWage: 1500.90,
-    logged: true,
-    profileId: 1,
-    status: 'ACTIVE',
-  }, {
-    id: 2,
-    name: 'user2',
-    email: 'user2@email',
-    age: 2,
-    realWage: 2500.90,
-    logged: true,
-    profileId: 2,
-    status: 'INACTIVE',
-  },
-];
+const ArrayMathUtils = require('../utils/ArrayMathUtils');
+
+// init instances
+const arrayMathUtils = new ArrayMathUtils();
+
+let id = 1;
+const nextID = () => id++;
 
 const profiles = [
   {
@@ -30,6 +16,28 @@ const profiles = [
   },
 ];
 
+const users = [
+  {
+    id: nextID(),
+    name: 'user1',
+    email: 'user1@email',
+    age: 50,
+    realWage: arrayMathUtils.toFloat(arrayMathUtils.randomBetween(1000, 10000)),
+    logged: true,
+    profileId: arrayMathUtils.randomBetween(1, profiles.length),
+    status: 'ACTIVE',
+  }, {
+    id: nextID(),
+    name: 'user2',
+    email: 'user2@email',
+    age: 75,
+    realWage: arrayMathUtils.toFloat(arrayMathUtils.randomBetween(1000, 10000)),
+    logged: true,
+    profileId: arrayMathUtils.randomBetween(1, profiles.length),
+    status: 'INACTIVE',
+  },
+];
+
 Array.prototype.filterByID = function(id) {
   const selected = this
     .filter(element => element.id === id);
@@ -37,6 +45,7 @@ Array.prototype.filterByID = function(id) {
 }
 
 module.exports = {
+  nextID,
   users,
   profiles,
 };
