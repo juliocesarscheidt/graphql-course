@@ -1,19 +1,22 @@
 type Mutation {
   # comma is optional
+  # createUser(
+  #   name: String!
+  #   email: String!
+  #   age: Int
+  # ): User
+
+  # using input
   createUser(
-    name: String!
-    email: String!
-    age: Int
+    payload: UserDataInput!
   ): User
 
   deleteUser(
-    id: Int!
+    filter: FilterUserInput!
   ): User
 
   updateUser(
-    id: Int!
-    name: String
-    email: String
-    age: Int
+    filter: FilterUserInput!
+    payload: UserDataInput!
   ): User
 }

@@ -11,8 +11,19 @@ type User {
   age: Int
   finalWage: Float
   logged: Boolean
-  randomString: String
   profileId: Int
   profile: Profile
   status: UserStatus
+  createdAt: Date
+}
+
+input UserDataInput {
+  name: String
+  email: String
+  age: Int
+}
+
+input FilterUserInput {
+  id: Int
+  email: String
 }

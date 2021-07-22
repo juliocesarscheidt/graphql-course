@@ -5,19 +5,6 @@ const ArrayMathUtils = require('../utils/ArrayMathUtils');
 const arrayMathUtils = new ArrayMathUtils();
 
 module.exports = {
-  hello() {
-    return 'Hello World';
-  },
-
-  dateHour() {
-    return new Date(Date.now()).toISOString();
-  },
-
-  loggedUser() {
-    const randIndex = arrayMathUtils.randomBetween(0, users.length - 1);
-    return users[randIndex];
-  },
-
   randomUniqueNumbers() {
     const [min, max] = [10, 100];
     const numbers = arrayMathUtils.buildRandomArr(10, min, max);
@@ -26,9 +13,16 @@ module.exports = {
   },
 
   // first parameter of the resolver is the object itself
-  user(_, { id }) {
-    // args { id: 1 }
-    return users.filterByID(id);
+  user(_, { filter }) {
+    const { id, email } = filter;
+
+    if (id) {
+      return users.filterByID(id);
+    } else if (email) {
+      return users.filterByEmail(email);
+    }
+
+    return null;
   },
 
   users() {
@@ -36,7 +30,6 @@ module.exports = {
   },
 
   profile(_, { id }) {
-    // args { id: 1 }
     return profiles.filterByID(id);
   },
 
