@@ -19,17 +19,17 @@ const profiles = [
 const users = [
   {
     id: nextID(),
-    name: 'user1',
-    email: 'user1@email',
-    age: 50,
+    name: 'user001',
+    email: 'user001@email',
+    age: 25,
     realWage: arrayMathUtils.toFloat(arrayMathUtils.randomBetween(1000, 10000)),
     logged: true,
     profileId: arrayMathUtils.randomBetween(1, profiles.length),
     status: 'ACTIVE',
   }, {
     id: nextID(),
-    name: 'user2',
-    email: 'user2@email',
+    name: 'user002',
+    email: 'user002@email',
     age: 75,
     realWage: arrayMathUtils.toFloat(arrayMathUtils.randomBetween(1000, 10000)),
     logged: true,

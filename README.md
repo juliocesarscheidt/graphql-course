@@ -38,9 +38,20 @@ query {
 // Mutation examples:
 mutation {
   createUser(
-    name:"Test"
-    email: "test@mail.com"
+    name:"user003"
+    email: "user003@email"
     age: 25
+  ) { ...fullUserData }
+
+  deleteUser(
+    id: 1
+  ) { ...fullUserData }
+
+  updateUser(
+    id: 1,
+    name:"user0010"
+    email: "user0010@email"
+    age: 50
   ) { ...fullUserData }
 }
 ```

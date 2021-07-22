@@ -6,7 +6,12 @@ const arrayMathUtils = new ArrayMathUtils();
 
 module.exports = {
   createUser(_, { name, email, age }) {
-    const newUser = {
+    const existingEmail = users.some(u => u.email.trim() === email.trim());
+    if (existingEmail) {
+      throw new Error('[ERROR] Duplicated email');
+    }
+
+    const data = {
       id: nextID(),
       name,
       email,
@@ -16,9 +21,42 @@ module.exports = {
       profileId: arrayMathUtils.randomBetween(1, profiles.length),
       status: 'ACTIVE',
     }
+    users.push(data);
 
-    users.push(newUser);
+    return data;
+  },
 
-    return newUser;
-  }
+  deleteUser(_, { id }) {
+    const existingUserIndex = users.findIndex(u => u.id === id);
+    if (existingUserIndex < 0) {
+      throw new Error('[ERROR] Inexisting user');
+    }
+
+    const [data] = users.splice(existingUserIndex, 1);
+    return data;
+  },
+
+  updateUser(_, { id, name, email, age }) {
+    const existingUserIndex = users.findIndex(u => u.id === id);
+    if (existingUserIndex < 0) {
+      throw new Error('[ERROR] Inexisting user');
+    }
+
+    // check if this email is already used by another user
+    const existingEmail = users.some(u => u.email.trim() === email.trim() && u.id !== id);
+    if (existingEmail) {
+      throw new Error('[ERROR] Duplicated email');
+    }
+
+    const existingUser = users[existingUserIndex];
+
+    const updatedUser = Object.assign(existingUser, {
+      name: name ?? existingUser.name,
+      email: email ?? existingUser.email,
+      age: age ?? existingUser.age,
+    });
+
+    const [data] = users.splice(existingUserIndex, 1, updatedUser);
+    return data;
+  },
 };
