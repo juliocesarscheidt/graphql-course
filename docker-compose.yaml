@@ -4,6 +4,8 @@ services:
   app:
     command: 'sh -c "yarn install && yarn run dev"'
     container_name: app
+    hostname: app
+    image: juliocesarmidia/graphql-course-app:latest
     build:
       context: .
       dockerfile: Dockerfile
