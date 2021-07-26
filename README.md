@@ -8,7 +8,9 @@ This is a tiny project to use GraphQL and its features
 // Query examples:
 
 fragment fullProfileData on Profile {
-  id name
+  id
+  name
+  createdAt
 }
 
 fragment fullUserData on User {
@@ -44,11 +46,13 @@ query {
 
 // Mutation examples:
 mutation {
+  # user
   createUser(
     payload: {
       name: "user003"
       email: "user003@email"
       age: 25
+      profileId: 1
     }
   ) { ...fullUserData }
 
@@ -72,6 +76,7 @@ mutation {
       name: "user0010"
       email: "user0010@email"
       age: 50
+      profileId: 1
     }
   ) { ...fullUserData }
 
@@ -83,7 +88,30 @@ mutation {
       name: "user0010"
       email: "user0010@email"
       age: 50
+      profileId: 1
     }
   ) { ...fullUserData }
+
+  # profile
+  createProfile(
+    payload: {
+      name: "PROFILE_03"
+    }
+  ) { ...fullProfileData }
+
+  deleteProfile(
+    filter: {
+      id: 3
+    }
+  ) { ...fullProfileData }
+
+  updateProfile(
+    filter: {
+      id: 2
+    }
+    payload: {
+      name: "PROFILE_2"
+    }
+  ) { ...fullProfileData }
 }
 ```

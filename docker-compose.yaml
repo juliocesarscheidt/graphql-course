@@ -10,6 +10,7 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
+      APP_HOST: ${APP_HOST:-0.0.0.0}
       APP_PORT: ${APP_PORT:-4000}
     networks:
       - subnet_0

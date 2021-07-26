@@ -1,4 +1,13 @@
 type Profile {
   id: Int
   name: String!
+  createdAt: Date
+}
+
+input ProfileDataInput {
+  name: String
+}
+
+input FilterProfileInput {
+  id: Int
 }

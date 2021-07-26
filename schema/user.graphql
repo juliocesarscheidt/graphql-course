@@ -21,6 +21,7 @@ input UserDataInput {
   name: String
   email: String
   age: Int
+  profileId: Int
 }
 
 input FilterUserInput {

@@ -1,8 +1,4 @@
 const { profiles } = require('../data/datasource');
-const ArrayMathUtils = require('../utils/ArrayMathUtils');
-
-// init instances
-const arrayMathUtils = new ArrayMathUtils();
 
 module.exports = {
   finalWage(user) {

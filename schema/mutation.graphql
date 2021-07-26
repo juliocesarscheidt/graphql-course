@@ -6,7 +6,7 @@ type Mutation {
   #   age: Int
   # ): User
 
-  # using input
+  # USER - using input
   createUser(
     payload: UserDataInput!
   ): User
@@ -19,4 +19,18 @@ type Mutation {
     filter: FilterUserInput!
     payload: UserDataInput!
   ): User
+
+  # PROFILE - using input
+  createProfile(
+    payload: ProfileDataInput!
+  ): Profile
+
+  deleteProfile(
+    filter: FilterProfileInput!
+  ): Profile
+
+  updateProfile(
+    filter: FilterProfileInput!
+    payload: ProfileDataInput!
+  ): Profile
 }

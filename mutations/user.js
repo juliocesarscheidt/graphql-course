@@ -1,4 +1,4 @@
-const { users, profiles, nextID } = require('../data/datasource');
+const { users, profiles, nextIDUsers } = require('../data/datasource');
 const ArrayMathUtils = require('../utils/ArrayMathUtils');
 
 // init instances
@@ -7,21 +7,25 @@ const arrayMathUtils = new ArrayMathUtils();
 module.exports = {
   // using payload input
   createUser(_, { payload }) {
-    const { name, email, age } = payload;
+    const { name, email, age, profileId } = payload;
 
     const index = users.findIndexByEmail(email.trim());
     if (index > -1) {
       throw new Error('[ERROR] Duplicated email');
     }
+    // check if profile exists
+    if (!profiles.filterByID(profileId)) {
+      throw new Error('[ERROR] Inexisting profile');
+    }
 
     const data = {
-      id: nextID(),
+      id: nextIDUsers(),
       name,
       email,
       age,
       realWage: arrayMathUtils.toFloat(arrayMathUtils.randomBetween(1000, 10000)),
       logged: true,
-      profileId: arrayMathUtils.randomBetween(1, profiles.length),
+      profileId,
       status: 'ACTIVE',
       createdAt: new Date(Date.now()).toISOString(),
     }
@@ -61,9 +65,17 @@ module.exports = {
     }
 
     // check if this email is already being used by another user
-    const existingEmail = users.some(u => u.email.trim() === payload.email.trim() && u.id !== id);
-    if (existingEmail) {
-      throw new Error('[ERROR] Duplicated email');
+    if (payload.email) {
+      const existingEmail = users.some(u => u.email.trim() === payload.email.trim() && u.id !== id);
+      if (existingEmail) {
+        throw new Error('[ERROR] Duplicated email');
+      }
+    }
+    // check if profile exists
+    if (payload.profileId) {
+      if (!profiles.filterByID(payload.profileId)) {
+        throw new Error('[ERROR] Inexisting profile');
+      }
     }
 
     const existingUser = users[index];
@@ -72,6 +84,7 @@ module.exports = {
       name: payload.name ?? existingUser.name,
       email: payload.email ?? existingUser.email,
       age: payload.age ?? existingUser.age,
+      profileId: payload.profileId ?? existingUser.profileId,
     });
 
     const [data] = users.splice(index, 1, updatedUser);
