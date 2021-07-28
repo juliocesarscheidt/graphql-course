@@ -1,4 +1,4 @@
-const { users, profiles, nextIDUsers } = require('../data/datasource');
+const { users, profiles, nextIDUsers } = require('../infrastructure/mock/datasource');
 const ArrayMathUtils = require('../utils/ArrayMathUtils');
 
 // init instances

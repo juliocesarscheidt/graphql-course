@@ -1,4 +1,4 @@
-const { profiles } = require('../data/datasource');
+const { profiles } = require('../infrastructure/mock/datasource');
 
 module.exports = {
   finalWage(user) {

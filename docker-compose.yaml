@@ -2,13 +2,13 @@ version: '3.4'
 
 services:
   app:
-    command: 'sh -c "yarn install && yarn run dev"'
-    container_name: app
-    hostname: app
     image: juliocesarmidia/graphql-course-app:latest
     build:
       context: .
       dockerfile: Dockerfile
+    command: 'sh -c "yarn install && yarn run dev"'
+    container_name: app
+    hostname: app
     environment:
       APP_HOST: ${APP_HOST:-0.0.0.0}
       APP_PORT: ${APP_PORT:-4000}
@@ -21,9 +21,27 @@ services:
       - ./:/app:rw
       - app-node-modules:/app/node_modules:rw
 
+  postgres:
+    image: postgres:9.6-alpine
+    container_name: postgres
+    hostname: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-graphql_course}
+    networks:
+      - subnet_0
+    restart: on-failure
+    ports:
+      - "35432:5432"
+    volumes:
+      - ./infrastructure/database/init.sql:/docker-entrypoint-initdb.d/init.sql:rw
+      - postgres-data:/var/lib/postgresql/data:rw
+
 networks:
   subnet_0:
     driver: bridge
 
 volumes:
   app-node-modules: {}
+  postgres-data: {}

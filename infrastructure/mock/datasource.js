@@ -1,4 +1,4 @@
-const ArrayMathUtils = require('../utils/ArrayMathUtils');
+const ArrayMathUtils = require('../../utils/ArrayMathUtils');
 
 // init instances
 const arrayMathUtils = new ArrayMathUtils();

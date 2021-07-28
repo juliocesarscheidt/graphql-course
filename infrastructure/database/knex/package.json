@@ -1,0 +1,17 @@
+{
+  "name": "knex-course",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "knex": "knex --knexfile=knexfile.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "knex": "^0.95.8",
+    "pg": "^8.7.1"
+  }
+}

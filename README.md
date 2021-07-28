@@ -43,7 +43,11 @@ query {
 
   # profiles { ...fullProfileData }
 }
+```
 
+## Mutation examples
+
+```graphql
 // Mutation examples:
 mutation {
   # user
