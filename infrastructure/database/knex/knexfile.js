@@ -1,12 +1,18 @@
+const DATABASE_HOST = process.env.DATABASE_HOST || '127.0.0.1';
+const DATABASE_PORT = process.env.DATABASE_PORT || 5432;
+const DATABASE_USER = process.env.DATABASE_USER || 'postgres';
+const DATABASE_PASS = process.env.DATABASE_PASS || 'postgres';
+const DATABASE_NAME = process.env.DATABASE_NAME || 'graphql_course';
+
 module.exports = {
   development: {
     client: 'postgresql',
     connection: {
-      host:     '127.0.0.1',
-      port:     5432,
-      database: 'graphql_course',
-      user:     'postgres',
-      password: 'postgres',
+      host:     DATABASE_HOST,
+      port:     DATABASE_PORT,
+      database: DATABASE_NAME,
+      user:     DATABASE_USER,
+      password: DATABASE_PASS,
       charset:  'utf8',
     },
     migrations: {
@@ -17,11 +23,11 @@ module.exports = {
   staging: {
     client: 'postgresql',
     connection: {
-      host:     '127.0.0.1',
-      port:     5432,
-      database: 'graphql_course',
-      user:     'postgres',
-      password: 'postgres',
+      host:     DATABASE_HOST,
+      port:     DATABASE_PORT,
+      database: DATABASE_NAME,
+      user:     DATABASE_USER,
+      password: DATABASE_PASS,
       charset:  'utf8',
     },
     pool: {
@@ -36,11 +42,11 @@ module.exports = {
   production: {
     client: 'postgresql',
     connection: {
-      host:     '127.0.0.1',
-      port:     5432,
-      database: 'graphql_course',
-      user:     'postgres',
-      password: 'postgres',
+      host:     DATABASE_HOST,
+      port:     DATABASE_PORT,
+      database: DATABASE_NAME,
+      user:     DATABASE_USER,
+      password: DATABASE_PASS,
       charset:  'utf8',
     },
     pool: {

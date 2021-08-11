@@ -1,25 +1,30 @@
 # Knex Migrations
 
 ```bash
+# run migrations
+docker-compose up --build migrations
+
+# run latest or rollback
+docker-compose run migrations --knexfile=knexfile.js migrate:latest
+docker-compose run migrations --knexfile=knexfile.js migrate:rollback
+
+
 # creates the knexfile
-npx knex init
+yarn run knex init
 
 # creates a table
-npx knex --knexfile=knexfile.js migrate:make table_profile
 yarn run knex migrate:make table_profile
 
-npx knex --knexfile=knexfile.js migrate:make table_user
 yarn run knex migrate:make table_user
 
-npx knex --knexfile=knexfile.js migrate:make table_user_profile
 yarn run knex migrate:make table_user_profile
 
 
-npx knex --knexfile=knexfile.js migrate:latest
-npx knex --knexfile=knexfile.js migrate:rollback
+yarn run knex --knexfile=knexfile.js migrate:latest
+yarn run knex --knexfile=knexfile.js migrate:rollback
 
-npx knex --knexfile=knexfile.js seed:make <SEED_NAME>
-npx knex --knexfile=knexfile.js seed:run
+yarn run knex --knexfile=knexfile.js seed:make <SEED_NAME>
+yarn run knex --knexfile=knexfile.js seed:run
 
 
 # postgres

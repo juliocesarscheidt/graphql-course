@@ -2,6 +2,21 @@
 
 This is a tiny project to use GraphQL and its features
 
+## Running
+
+```bash
+# run postgres
+docker-compose up -d postgres
+
+# run migrations
+docker-compose up --build migrations
+
+# run app
+docker-compose up --build -d app
+docker-compose logs -f app
+# running on http://localhost:4000/
+```
+
 ## Query examples
 
 ```graphql

@@ -2,10 +2,9 @@
   "name": "knex-course",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "knexfile.js",
   "scripts": {
-    "start": "node index.js",
-    "knex": "knex --knexfile=knexfile.js"
+    "knex": "knex"
   },
   "keywords": [],
   "author": "",

@@ -21,6 +21,27 @@ services:
       - ./:/app:rw
       - app-node-modules:/app/node_modules:rw
 
+  migrations:
+    image: juliocesarmidia/graphql-course-migrations:latest
+    build:
+      context: infrastructure/database/knex/
+      dockerfile: Dockerfile
+    command: '--knexfile=knexfile.js migrate:latest'
+    container_name: migrations
+    hostname: migrations
+    environment:
+      DATABASE_HOST: ${DATABASE_HOST:-postgres}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_USER: ${DATABASE_USER:-postgres}
+      DATABASE_PASS: ${DATABASE_PASS:-postgres}
+      DATABASE_NAME: ${DATABASE_NAME:-graphql_course}
+    networks:
+      - subnet_0
+    restart: "no"
+    volumes:
+      - ./infrastructure/database/knex/:/app:rw
+      - migrations-node-modules:/app/node_modules:rw
+
   postgres:
     image: postgres:9.6-alpine
     container_name: postgres
@@ -33,7 +54,7 @@ services:
       - subnet_0
     restart: on-failure
     ports:
-      - "35432:5432"
+      - "5432:5432"
     volumes:
       - ./infrastructure/database/init.sql:/docker-entrypoint-initdb.d/init.sql:rw
       - postgres-data:/var/lib/postgresql/data:rw
@@ -44,4 +65,5 @@ networks:
 
 volumes:
   app-node-modules: {}
+  migrations-node-modules: {}
   postgres-data: {}
