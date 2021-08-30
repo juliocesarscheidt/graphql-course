@@ -18,6 +18,8 @@ module.exports = {
     migrations: {
       tableName: 'knex_migrations'
     },
+    debug: true,
+    acquireConnectionTimeout: 10 * 1000,
   },
 
   staging: {
@@ -37,6 +39,8 @@ module.exports = {
     migrations: {
       tableName: 'knex_migrations'
     },
+    debug: false,
+    acquireConnectionTimeout: 10 * 1000,
   },
 
   production: {
@@ -56,5 +60,7 @@ module.exports = {
     migrations: {
       tableName: 'knex_migrations'
     },
+    debug: false,
+    acquireConnectionTimeout: 10 * 1000,
   },
 };

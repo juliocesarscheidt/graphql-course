@@ -4,7 +4,8 @@
   "description": "",
   "main": "knexfile.js",
   "scripts": {
-    "knex": "knex"
+    "knex": "knex",
+    "test": "node tests/index.js"
   },
   "keywords": [],
   "author": "",
