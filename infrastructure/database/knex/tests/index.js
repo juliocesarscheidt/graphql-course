@@ -3,16 +3,20 @@ const knex = require('../config/config')(env);
 
 (async () => {
   console.log('[INFO] Running insert...');
-  const insert = require('./insert')
-  await insert(knex);
+  const insertScript = require('./insert')
+  await insertScript(knex);
 
   console.log('[INFO] Running select...');
-  const select = require('./select')
-  await select(knex);
+  const selectScript = require('./select')
+  await selectScript(knex);
 
   console.log('[INFO] Running update...');
-  const update = require('./update')
-  await update(knex);
+  const updateScript = require('./update')
+  await updateScript(knex);
+
+  console.log('[INFO] Running delete...');
+  const deleteScript = require('./delete')
+  await deleteScript(knex);
 
   knex.destroy();
 })();

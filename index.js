@@ -5,6 +5,9 @@ const resolvers = require('./resolvers');
 
 const server = require('./server')(typeDefs, resolvers);
 
+const env = process.env?.ENVIRONMENT || 'development';
+const knex = require('./infrastructure/database/knex/config/config')(env);
+
 // port default => 4000
 const host = process.env?.APP_HOST ?? '0.0.0.0';
 const port = process.env?.APP_PORT ?? 4000;

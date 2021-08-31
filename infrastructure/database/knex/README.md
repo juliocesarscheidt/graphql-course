@@ -5,13 +5,13 @@
 docker-compose up --build migrations
 
 # run latest or rollback
-docker-compose run migrations --knexfile=knexfile.js migrate:latest --env development
-docker-compose run migrations --knexfile=knexfile.js migrate:rollback --env development
+docker-compose run migrations --knexfile=knexfile.js --env development migrate:latest
+docker-compose run migrations --knexfile=knexfile.js --env development migrate:rollback
 
-docker-compose run migrations --knexfile=knexfile.js migrate:up --env development
-docker-compose run migrations --knexfile=knexfile.js migrate:down --env development
+docker-compose run migrations --knexfile=knexfile.js --env development migrate:up
+docker-compose run migrations --knexfile=knexfile.js --env development migrate:down
 
-docker-compose run migrations --knexfile=knexfile.js migrate:list --env development
+docker-compose run migrations --knexfile=knexfile.js --env development migrate:list
 
 
 # tests

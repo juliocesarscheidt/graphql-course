@@ -8,8 +8,15 @@ This is a tiny project to use GraphQL and its features
 # run postgres
 docker-compose up -d postgres
 
+# build migrations
+docker-compose build migrations
 # run migrations
-docker-compose up --build migrations
+docker-compose run migrations \
+  --knexfile=knexfile.js \
+  --env development migrate:latest
+
+# run tests
+docker-compose run --entrypoint "yarn run test" migrations
 
 # run app
 docker-compose up --build -d app
