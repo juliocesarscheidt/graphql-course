@@ -1,6 +1,6 @@
 # GraphQL Project
 
-This is a tiny project to use GraphQL and its features
+This is a tiny project to use GraphQL and its features, it is using Postgres as Database and Knex to migrations.
 
 ## Running
 
@@ -40,7 +40,6 @@ fragment fullUserData on User {
   name
   email
   age
-  finalWage
   logged
   profileId
   profile { ...fullProfileData }

@@ -1,12 +1,12 @@
-const { profiles } = require('../infrastructure/mock/datasource');
+const env = process.env?.ENVIRONMENT || 'development';
+const knex = require('../infrastructure/database/knex/config/config')(env);
 
 module.exports = {
-  finalWage(user) {
-    const taxesAndFees = 0.05;
-    return (user.realWage - (user.realWage * taxesAndFees)).toFixed(2);
-  },
-
   profile({ profileId }) {
-    return profiles.filterByID(profileId);
+    return knex
+      .select(['id', 'name', 'createdAt'])
+      .from('profiles')
+      .where({ id: profileId })
+      .first();
   },
 };

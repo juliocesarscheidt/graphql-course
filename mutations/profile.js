@@ -1,53 +1,67 @@
-const { users, profiles, nextIDProfiles } = require('../infrastructure/mock/datasource');
-const ArrayMathUtils = require('../utils/ArrayMathUtils');
-
-// init instances
-const arrayMathUtils = new ArrayMathUtils();
+const env = process.env?.ENVIRONMENT || 'development';
+const knex = require('../infrastructure/database/knex/config/config')(env);
 
 module.exports = {
   // using payload input
-  createProfile(_, { payload }) {
+  async createProfile(_, { payload }) {
     const { name } = payload;
 
-    const data = {
-      id: nextIDProfiles(),
-      name,
-      createdAt: new Date(Date.now()).toISOString(),
-    }
-    profiles.push(data);
+    const [result] = await knex.insert({ name })
+      .into('profiles')
+      .onConflict('name')
+      .merge()
+      .returning('*');
 
-    return data;
+    return result;
   },
 
-  deleteProfile(_, { filter }) {
+  async deleteProfile(_, { filter }) {
     const { id } = filter;
-    let index = profiles.findIndexByID(id);
-    if (index < 0) {
+
+    const profile = await knex
+      .select()
+      .from('profiles')
+      .where({ id })
+      .first();
+    if (!profile) {
       throw new Error('[ERROR] Inexisting profile');
     }
-    // check if profile is used
-    if (users.filterBy(id, 'profileId')) {
+
+    const counterInUse = await knex('users')
+      .count('id', { as: 'counter' })
+      .where({ profileId: id })
+      .first();
+    if (counterInUse.counter > 0) {
       throw new Error('[ERROR] Profile is being used');
     }
 
-    const [data] = profiles.splice(index, 1);
-    return data;
+    await knex('profiles')
+      .where({ id })
+      .delete();
+
+    return profile;
   },
 
-  updateProfile(_, { filter, payload }) {
+  async updateProfile(_, { filter, payload }) {
     const { id } = filter;
-    let index = profiles.findIndexByID(id);
-    if (index < 0) {
+
+    const profile = await knex
+      .select()
+      .from('profiles')
+      .where({ id })
+      .first();
+    if (!profile) {
       throw new Error('[ERROR] Inexisting profile');
     }
 
-    const existingProfile = profiles[index];
-
-    const updatedProfile = Object.assign(existingProfile, {
-      name: payload.name ?? existingProfile.name,
+    const updatedProfile = Object.assign(profile, {
+      name: payload.name ?? profile.name,
     });
 
-    const [data] = profiles.splice(index, 1, updatedProfile);
-    return data;
+    await knex('profiles')
+      .where({ id })
+      .update(updatedProfile);
+
+    return updatedProfile;
   },
 };

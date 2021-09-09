@@ -11,6 +11,7 @@ exports.up = (knex) => {
     table.increments('id').primary();
     table.string('name').notNull().unique();
     table.datetime('createdAt').defaultTo(knex.fn.now());
+
   }).then(() => {
     return knex('profiles').insert(profiles);
   })

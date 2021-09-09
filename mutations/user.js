@@ -1,93 +1,148 @@
-const { users, profiles, nextIDUsers } = require('../infrastructure/mock/datasource');
-const ArrayMathUtils = require('../utils/ArrayMathUtils');
-
-// init instances
-const arrayMathUtils = new ArrayMathUtils();
+const env = process.env?.ENVIRONMENT || 'development';
+const knex = require('../infrastructure/database/knex/config/config')(env);
 
 module.exports = {
   // using payload input
-  createUser(_, { payload }) {
+  async createUser(_, { payload }) {
     const { name, email, age, profileId } = payload;
 
-    const index = users.findIndexByEmail(email.trim());
-    if (index > -1) {
+    const counterExistingEmail = await knex('users')
+      .count('id', { as: 'counter' })
+      .where({ email })
+      .first();
+    if (counterExistingEmail.counter > 0) {
       throw new Error('[ERROR] Duplicated email');
     }
-    // check if profile exists
-    if (!profiles.filterByID(profileId)) {
+
+    const counterExistingProfile = await knex('profiles')
+      .count('id', { as: 'counter' })
+      .where({ id: profileId })
+      .first();
+    if (counterExistingProfile.counter <= 0) {
       throw new Error('[ERROR] Inexisting profile');
     }
 
     const data = {
-      id: nextIDUsers(),
       name,
       email,
       age,
-      realWage: arrayMathUtils.toFloat(arrayMathUtils.randomBetween(1000, 10000)),
       logged: true,
       profileId,
       status: 'ACTIVE',
-      createdAt: new Date(Date.now()).toISOString(),
-    }
-    users.push(data);
+    };
 
-    return data;
+    const [result] = await knex.insert(data)
+      .into('users')
+      .onConflict('email')
+      .merge()
+      .returning('*');
+
+    return result;
   },
 
-  deleteUser(_, { filter }) {
+  async deleteUser(_, { filter }) {
     const { id, email } = filter;
-    let index = -1;
+
+    let user = null;
 
     if (id) {
-      index = users.findIndexByID(id);
+      user = await knex
+        .select()
+        .from('users')
+        .where({ id })
+        .first();
+      if (!user) {
+        throw new Error('[ERROR] Inexisting user');
+      }
+
+      await knex('users')
+        .where({ id })
+        .delete();
+
     } else if (email) {
-      index = users.findIndexByEmail(email.trim());
-    }
-    if (index < 0) {
-      throw new Error('[ERROR] Inexisting user');
+      user = await knex
+        .select()
+        .from('users')
+        .where({ email })
+        .first();
+      if (!user) {
+        throw new Error('[ERROR] Inexisting user');
+      }
+
+      await knex('users')
+        .where({ email })
+        .delete();
     }
 
-    const [data] = users.splice(index, 1);
-    return data;
+    return user;
   },
 
-  updateUser(_, { filter, payload }) {
+  async updateUser(_, { filter, payload }) {
     const { id, email } = filter;
-    let index = -1;
+
+    let user = null;
 
     if (id) {
-      index = users.findIndexByID(id);
+      user = await knex
+        .select()
+        .from('users')
+        .where({ id })
+        .first();
+      if (!user) {
+        throw new Error('[ERROR] Inexisting user');
+      }
+
     } else if (email) {
-      index = users.findIndexByEmail(email.trim());
-    }
-    if (index < 0) {
-      throw new Error('[ERROR] Inexisting user');
+      user = await knex
+        .select()
+        .from('users')
+        .where({ email })
+        .first();
+      if (!user) {
+        throw new Error('[ERROR] Inexisting user');
+      }
     }
 
     // check if this email is already being used by another user
     if (payload.email) {
-      const existingEmail = users.some(u => u.email.trim() === payload.email.trim() && u.id !== id);
-      if (existingEmail) {
+      const counterExistingEmail = await knex('users')
+        .count('id', { as: 'counter' })
+        .where({ email: payload.email })
+        .andWhere(knex.raw('id != ?', [id]))
+        .first();
+      if (counterExistingEmail.counter > 0) {
         throw new Error('[ERROR] Duplicated email');
       }
     }
     // check if profile exists
     if (payload.profileId) {
-      if (!profiles.filterByID(payload.profileId)) {
+      const counterExistingProfile = await knex('profiles')
+        .count('id', { as: 'counter' })
+        .where({ id: payload.profileId })
+        .first();
+      if (counterExistingProfile.counter <= 0) {
         throw new Error('[ERROR] Inexisting profile');
       }
     }
 
-    const existingUser = users[index];
-
-    const updatedUser = Object.assign(existingUser, {
-      name: payload.name ?? existingUser.name,
-      email: payload.email ?? existingUser.email,
-      age: payload.age ?? existingUser.age,
-      profileId: payload.profileId ?? existingUser.profileId,
+    const updatedUser = Object.assign(user, {
+      name: payload.name ?? user.name,
+      email: payload.email ?? user.email,
+      age: payload.age ?? user.age,
+      profileId: payload.profileId ?? user.profileId,
     });
 
-    const [data] = users.splice(index, 1, updatedUser);
-    return data;
+    if (id) {
+      await knex('users')
+        .where({ id })
+        .update(updatedUser);
+
+    } else if (email) {
+        await knex('users')
+        .where({ email })
+        .update(updatedUser);
+    }
+
+    return updatedUser;
   },
 };

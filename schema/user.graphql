@@ -9,7 +9,6 @@ type User {
   name: String!
   email: String!
   age: Int
-  finalWage: Float
   logged: Boolean
   profileId: Int
   profile: Profile

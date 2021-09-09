@@ -1,5 +1,7 @@
-const { users, profiles } = require('../infrastructure/mock/datasource');
 const ArrayMathUtils = require('../utils/ArrayMathUtils');
+
+const env = process.env?.ENVIRONMENT || 'development';
+const knex = require('../infrastructure/database/knex/config/config')(env);
 
 // init instances
 const arrayMathUtils = new ArrayMathUtils();
@@ -13,27 +15,45 @@ module.exports = {
   },
 
   // first parameter of the resolver is the object itself
-  user(_, { filter }) {
+  async user(_, { filter }) {
     const { id, email } = filter;
+    let user = null;
 
     if (id) {
-      return users.filterByID(id);
+      user = await knex
+        .select()
+        .from('users')
+        .where({ id })
+        .first();
+
     } else if (email) {
-      return users.filterByEmail(email);
+      user = await knex
+        .select()
+        .from('users')
+        .where({ email })
+        .first();
     }
 
-    return null;
+    return user;
   },
 
   users() {
-    return users;
+    return knex
+      .select()
+      .from('users');
   },
 
   profile(_, { id }) {
-    return profiles.filterByID(id);
+    return knex
+      .select()
+      .from('profiles')
+      .where({ id })
+      .first();
   },
 
   profiles() {
-    return profiles;
+    return knex
+      .select()
+      .from('profiles');
   },
 };
