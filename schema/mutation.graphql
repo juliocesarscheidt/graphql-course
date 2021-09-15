@@ -7,9 +7,13 @@ type Mutation {
   # ): User
 
   # USER - using input
+  registerUser(
+    payload: UserDataRegisterInput!
+  ): User!
+
   createUser(
-    payload: UserDataInput!
-  ): User
+    payload: UserDataCreateInput!
+  ): User!
 
   deleteUser(
     filter: FilterUserInput!
@@ -17,7 +21,7 @@ type Mutation {
 
   updateUser(
     filter: FilterUserInput!
-    payload: UserDataInput!
+    payload: UserDataCreateInput!
   ): User
 
   # PROFILE - using input

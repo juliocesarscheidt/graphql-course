@@ -7,6 +7,7 @@ module.exports = (knex) => new Promise(async (resolve, reject) => {
     const user = {
       name: `user_${rand}`,
       email: `user_${rand}_inserted@mail.com`,
+      password: `password_${rand}`,
       age: makeRandom(10, 100),
       logged: false,
       status: 'ACTIVE',

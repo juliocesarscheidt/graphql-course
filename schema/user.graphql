@@ -8,19 +8,43 @@ type User {
   id: Int
   name: String!
   email: String!
+  password: String!
   age: Int
   logged: Boolean
   profileId: Int
   profile: Profile
   status: UserStatus
   createdAt: Date
+  token: String
 }
 
-input UserDataInput {
-  name: String
-  email: String
+type UserAuthenticationData {
+  id: Int
+  name: String!
+  email: String!
+  profileId: Int
+  profile: Profile
+  token: String!
+}
+
+input UserDataCreateInput {
+  name: String!
+  email: String!
+  password: String!
   age: Int
   profileId: Int
+}
+
+input UserDataRegisterInput {
+  name: String!
+  email: String!
+  password: String!
+  age: Int
+}
+
+input UserDataLoginInput {
+  email: String!
+  password: String!
 }
 
 input FilterUserInput {

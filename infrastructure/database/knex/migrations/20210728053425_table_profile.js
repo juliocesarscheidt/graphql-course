@@ -2,7 +2,7 @@ const profiles = [
   {
     name: 'Admin',
   }, {
-    name: 'Manager',
+    name: 'Common',
   },
 ];
 

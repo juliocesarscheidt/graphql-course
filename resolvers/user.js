@@ -1,7 +1,7 @@
-const env = process.env?.ENVIRONMENT || 'development';
+const env = process.env?.NODE_ENV || 'development';
 const knex = require('../infrastructure/database/knex/config/config')(env);
 
-module.exports = {
+const resolvers = {
   profile({ profileId }) {
     return knex
       .select(['id', 'name', 'createdAt'])
@@ -10,3 +10,5 @@ module.exports = {
       .first();
   },
 };
+
+module.exports = resolvers;

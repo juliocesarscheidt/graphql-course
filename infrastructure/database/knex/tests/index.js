@@ -1,4 +1,4 @@
-const env = process.env?.ENVIRONMENT || 'development';
+const env = process.env?.NODE_ENV || 'development';
 const knex = require('../config/config')(env);
 
 (async () => {

@@ -1,10 +1,31 @@
-const env = process.env?.ENVIRONMENT || 'development';
+const env = process.env?.NODE_ENV || 'development';
 const knex = require('../infrastructure/database/knex/config/config')(env);
 
-module.exports = {
-  // using payload input
+const { encryptPassword } = require('../utils/EncryptionUtils');
+
+const mutations = {
+  registerUser(_, { payload }) {
+    const { name, email, password, age } = payload;
+
+    return mutations.createUser(_,
+      {
+        payload: {
+          name,
+          email,
+          password,
+          age,
+        }
+      }
+    );
+  },
+
   async createUser(_, { payload }) {
-    const { name, email, age, profileId } = payload;
+    const { name, email, password, age } = payload;
+    let { profileId } = payload;
+
+    if (!password) {
+      throw new Error('[ERROR] Missing password');
+    }
 
     const counterExistingEmail = await knex('users')
       .count('id', { as: 'counter' })
@@ -14,17 +35,28 @@ module.exports = {
       throw new Error('[ERROR] Duplicated email');
     }
 
-    const counterExistingProfile = await knex('profiles')
-      .count('id', { as: 'counter' })
-      .where({ id: profileId })
-      .first();
-    if (counterExistingProfile.counter <= 0) {
-      throw new Error('[ERROR] Inexisting profile');
+    if (!profileId) {
+      // set "Common" profile
+      const profileCommon = await knex('profiles')
+        .select(['id'])
+        .where({ name: 'Common' })
+        .first();
+      profileId = profileCommon.id;
+
+    } else {
+      const counterExistingProfile = await knex('profiles')
+        .count('id', { as: 'counter' })
+        .where({ id: profileId })
+        .first();
+      if (counterExistingProfile.counter <= 0) {
+        throw new Error('[ERROR] Inexisting profile');
+      }
     }
 
     const data = {
       name,
       email,
+      password: encryptPassword(password),
       age,
       logged: true,
       profileId,
@@ -125,9 +157,14 @@ module.exports = {
       }
     }
 
+    if (payload.password) {
+      payload.password = encryptPassword(payload.password);
+    }
+
     const updatedUser = Object.assign(user, {
       name: payload.name ?? user.name,
       email: payload.email ?? user.email,
+      password: payload.password ?? user.password,
       age: payload.age ?? user.age,
       profileId: payload.profileId ?? user.profileId,
     });
@@ -146,3 +183,5 @@ module.exports = {
     return updatedUser;
   },
 };
+
+module.exports = mutations;

@@ -1,26 +1,30 @@
-const users = [
-  {
-    name: 'user001',
-    email: 'user001@email',
-    age: 25,
-    logged: true,
-    profileId: 1,
-    status: 'ACTIVE',
-  }, {
-    name: 'user002',
-    email: 'user002@email',
-    age: 75,
-    logged: true,
-    profileId: 2,
-    status: 'INACTIVE',
-  },
-];
+const users = [];
+// const users = [
+//   {
+//     name: 'user001',
+//     email: 'user001@email',
+//     password: '',
+//     age: 25,
+//     logged: true,
+//     profileId: 1,
+//     status: 'ACTIVE',
+//   }, {
+//     name: 'user002',
+//     email: 'user002@email',
+//     password: '',
+//     age: 75,
+//     logged: true,
+//     profileId: 2,
+//     status: 'INACTIVE',
+//   },
+// ];
 
 exports.up = (knex) => {
   return knex.schema.createTable('users', table => {
     table.increments('id').primary();
     table.string('name').notNull();
     table.string('email').notNull().unique();
+    table.string('password').notNull();
     table.integer('age').unsigned();
     table.boolean('logged').defaultTo(true);
     table.integer('profileId').unsigned();
@@ -29,10 +33,11 @@ exports.up = (knex) => {
 
   }).alterTable('users', table => {
     table.foreign(['profileId']).references('id').inTable('profiles');
+  });
 
-  }).then(() => {
-    return knex('users').insert(users);
-  })
+  // }).then(() => {
+  //   return knex('users').insert(users);
+  // })
 };
 
 exports.down = (knex) => {

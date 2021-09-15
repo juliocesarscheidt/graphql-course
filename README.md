@@ -19,16 +19,18 @@ docker-compose run migrations \
 docker-compose run --entrypoint "yarn run test" migrations
 
 # run app
+export NODE_ENV="development"
+export APP_AUTH_SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 docker-compose up --build -d app
 docker-compose logs -f app
 # running on http://localhost:4000/
+
+docker-compose config
 ```
 
-## Query examples
+## GraphQL Query Examples
 
 ```graphql
-// Query examples:
-
 fragment fullProfileData on Profile {
   id
   name
@@ -39,6 +41,7 @@ fragment fullUserData on User {
   id
   name
   email
+  password
   age
   logged
   profileId
@@ -47,8 +50,24 @@ fragment fullUserData on User {
   createdAt
 }
 
+fragment loginData on UserAuthenticationData {
+  id
+  name
+  email
+  profileId
+  profile { ...fullProfileData }
+  token
+}
+
 query {
   # randomUniqueNumbers
+
+  login(
+    payload: {
+      email: "user003@email"
+      password: "password"
+    }
+  ) { ...loginData }
 
   user(filter: {
     id: 1
@@ -69,15 +88,24 @@ query {
 ## Mutation examples
 
 ```graphql
-// Mutation examples:
 mutation {
   # user
   createUser(
     payload: {
       name: "user003"
       email: "user003@email"
+      password: "password"
       age: 25
       profileId: 1
+    }
+  ) { ...fullUserData }
+
+  registerUser(
+    payload: {
+      name: "user003"
+      email: "user003@email"
+      password: "password"
+      age: 25
     }
   ) { ...fullUserData }
 

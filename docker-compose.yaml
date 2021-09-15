@@ -5,14 +5,14 @@ services:
     image: juliocesarmidia/graphql-course-app:latest
     build:
       context: .
-      dockerfile: Dockerfile
     command: 'sh -c "yarn install && yarn run dev"'
     container_name: app
     hostname: app
     environment:
+      NODE_ENV: development
+      APP_AUTH_SECRET: ${APP_AUTH_SECRET}
       APP_HOST: ${APP_HOST:-0.0.0.0}
       APP_PORT: ${APP_PORT:-4000}
-      ENVIRONMENT: development
       DATABASE_HOST: ${DATABASE_HOST:-postgres}
       DATABASE_PORT: ${DATABASE_PORT:-5432}
       DATABASE_USER: ${DATABASE_USER:-postgres}
@@ -31,12 +31,11 @@ services:
     image: juliocesarmidia/graphql-course-migrations:latest
     build:
       context: infrastructure/database/knex/
-      dockerfile: Dockerfile
     command: '--knexfile=knexfile.js --env development migrate:latest'
     container_name: migrations
     hostname: migrations
     environment:
-      ENVIRONMENT: development
+      NODE_ENV: development
       DATABASE_HOST: ${DATABASE_HOST:-postgres}
       DATABASE_PORT: ${DATABASE_PORT:-5432}
       DATABASE_USER: ${DATABASE_USER:-postgres}
