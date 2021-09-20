@@ -5,6 +5,10 @@ This is a tiny project to use GraphQL and its features, it is using Postgres as 
 ## Running
 
 ```bash
+# set variables
+export NODE_ENV="development"
+export APP_AUTH_SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+
 # run postgres
 docker-compose up -d postgres
 
@@ -19,8 +23,6 @@ docker-compose run migrations \
 docker-compose run --entrypoint "yarn run test" migrations
 
 # run app
-export NODE_ENV="development"
-export APP_AUTH_SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 docker-compose up --build -d app
 docker-compose logs -f app
 # running on http://localhost:4000/
@@ -60,8 +62,6 @@ fragment loginData on UserAuthenticationData {
 }
 
 query {
-  # randomUniqueNumbers
-
   login(
     payload: {
       email: "user003@email"

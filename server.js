@@ -1,17 +1,9 @@
-const { ApolloServer, gql } = require('apollo-server');
+const { ApolloServer } = require('apollo-server');
 
-// const typeDefs = gql`
-//   type Query {
-//   }
-// `;
-// const resolvers = {
-//   Query: {
-//   }
-// };
-
-module.exports = (typeDefs, resolvers) => {
+module.exports = (typeDefs, resolvers, context = null) => {
   return new ApolloServer({
     typeDefs,
     resolvers,
+    context,
   });
 };

@@ -1,9 +1,6 @@
-const env = process.env?.NODE_ENV || 'development';
-const knex = require('../infrastructure/database/knex/config/config')(env);
-
 const resolvers = {
-  profile({ profileId }) {
-    return knex
+  profile({ profileId }, args, context) {
+    return context.knex
       .select(['id', 'name', 'createdAt'])
       .from('profiles')
       .where({ id: profileId })

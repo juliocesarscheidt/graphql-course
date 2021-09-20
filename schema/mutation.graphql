@@ -1,11 +1,4 @@
 type Mutation {
-  # comma is optional
-  # createUser(
-  #   name: String!
-  #   email: String!
-  #   age: Int
-  # ): User
-
   # USER - using input
   registerUser(
     payload: UserDataRegisterInput!
@@ -21,7 +14,7 @@ type Mutation {
 
   updateUser(
     filter: FilterUserInput!
-    payload: UserDataCreateInput!
+    payload: UserDataUpdateInput!
   ): User
 
   # PROFILE - using input

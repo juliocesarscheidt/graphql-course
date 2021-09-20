@@ -1,6 +1,5 @@
 class ArrayMathUtils {
   constructor() {
-    console.log('Creating ArrayMathUtils instance');
   }
 
   toInt(value, base = 10) {

@@ -35,6 +35,14 @@ input UserDataCreateInput {
   profileId: Int
 }
 
+input UserDataUpdateInput {
+  name: String
+  email: String
+  password: String
+  age: Int
+  profileId: Int
+}
+
 input UserDataRegisterInput {
   name: String!
   email: String!

@@ -4,8 +4,6 @@ scalar Date
 # entrypoints of the API
 # "!" is to make this parameters mandatory
 type Query {
-  # an array of integers mandatory, but it can be empty
-  randomUniqueNumbers: [Int]!
   login(payload: UserDataLoginInput!): UserAuthenticationData
   user(filter: FilterUserInput!): User
   users: [User]!

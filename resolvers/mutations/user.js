@@ -1,13 +1,11 @@
-const env = process.env?.NODE_ENV || 'development';
-const knex = require('../infrastructure/database/knex/config/config')(env);
-
-const { encryptPassword } = require('../utils/EncryptionUtils');
+const { encryptPassword } = require('../../utils/EncryptionUtils');
 
 const mutations = {
-  registerUser(_, { payload }) {
+  registerUser(_, { payload }, context) {
     const { name, email, password, age } = payload;
 
-    return mutations.createUser(_,
+    return mutations.createUser(
+      _,
       {
         payload: {
           name,
@@ -15,11 +13,12 @@ const mutations = {
           password,
           age,
         }
-      }
+      },
+      context,
     );
   },
 
-  async createUser(_, { payload }) {
+  async createUser(_, { payload }, context) {
     const { name, email, password, age } = payload;
     let { profileId } = payload;
 
@@ -27,7 +26,7 @@ const mutations = {
       throw new Error('[ERROR] Missing password');
     }
 
-    const counterExistingEmail = await knex('users')
+    const counterExistingEmail = await context.knex('users')
       .count('id', { as: 'counter' })
       .where({ email })
       .first();
@@ -37,14 +36,14 @@ const mutations = {
 
     if (!profileId) {
       // set "Common" profile
-      const profileCommon = await knex('profiles')
+      const profileCommon = await context.knex('profiles')
         .select(['id'])
         .where({ name: 'Common' })
         .first();
       profileId = profileCommon.id;
 
     } else {
-      const counterExistingProfile = await knex('profiles')
+      const counterExistingProfile = await context.knex('profiles')
         .count('id', { as: 'counter' })
         .where({ id: profileId })
         .first();
@@ -58,12 +57,12 @@ const mutations = {
       email,
       password: encryptPassword(password),
       age,
-      logged: true,
+      logged: false,
       profileId,
       status: 'ACTIVE',
     };
 
-    const [result] = await knex.insert(data)
+    const [result] = await context.knex.insert(data)
       .into('users')
       .onConflict('email')
       .merge()
@@ -72,13 +71,13 @@ const mutations = {
     return result;
   },
 
-  async deleteUser(_, { filter }) {
+  async deleteUser(_, { filter }, context) {
     const { id, email } = filter;
 
     let user = null;
 
     if (id) {
-      user = await knex
+      user = await context.knex
         .select()
         .from('users')
         .where({ id })
@@ -87,12 +86,12 @@ const mutations = {
         throw new Error('[ERROR] Inexisting user');
       }
 
-      await knex('users')
+      await context.knex('users')
         .where({ id })
         .delete();
 
     } else if (email) {
-      user = await knex
+      user = await context.knex
         .select()
         .from('users')
         .where({ email })
@@ -101,7 +100,7 @@ const mutations = {
         throw new Error('[ERROR] Inexisting user');
       }
 
-      await knex('users')
+      await context.knex('users')
         .where({ email })
         .delete();
     }
@@ -109,13 +108,13 @@ const mutations = {
     return user;
   },
 
-  async updateUser(_, { filter, payload }) {
+  async updateUser(_, { filter, payload }, context) {
     const { id, email } = filter;
 
     let user = null;
 
     if (id) {
-      user = await knex
+      user = await context.knex
         .select()
         .from('users')
         .where({ id })
@@ -125,7 +124,7 @@ const mutations = {
       }
 
     } else if (email) {
-      user = await knex
+      user = await context.knex
         .select()
         .from('users')
         .where({ email })
@@ -137,10 +136,10 @@ const mutations = {
 
     // check if this email is already being used by another user
     if (payload.email) {
-      const counterExistingEmail = await knex('users')
+      const counterExistingEmail = await context.knex('users')
         .count('id', { as: 'counter' })
         .where({ email: payload.email })
-        .andWhere(knex.raw('id != ?', [id]))
+        .andWhere(context.knex.raw('id != ?', [id]))
         .first();
       if (counterExistingEmail.counter > 0) {
         throw new Error('[ERROR] Duplicated email');
@@ -148,7 +147,7 @@ const mutations = {
     }
     // check if profile exists
     if (payload.profileId) {
-      const counterExistingProfile = await knex('profiles')
+      const counterExistingProfile = await context.knex('profiles')
         .count('id', { as: 'counter' })
         .where({ id: payload.profileId })
         .first();
@@ -170,12 +169,12 @@ const mutations = {
     });
 
     if (id) {
-      await knex('users')
+      await context.knex('users')
         .where({ id })
         .update(updatedUser);
 
     } else if (email) {
-        await knex('users')
+        await context.knex('users')
         .where({ email })
         .update(updatedUser);
     }

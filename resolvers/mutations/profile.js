@@ -1,12 +1,9 @@
-const env = process.env?.NODE_ENV || 'development';
-const knex = require('../infrastructure/database/knex/config/config')(env);
-
 module.exports = {
   // using payload input
-  async createProfile(_, { payload }) {
+  async createProfile(_, { payload }, context) {
     const { name } = payload;
 
-    const [result] = await knex.insert({ name })
+    const [result] = await context.knex.insert({ name })
       .into('profiles')
       .onConflict('name')
       .merge()
@@ -15,10 +12,10 @@ module.exports = {
     return result;
   },
 
-  async deleteProfile(_, { filter }) {
+  async deleteProfile(_, { filter }, context) {
     const { id } = filter;
 
-    const profile = await knex
+    const profile = await context.knex
       .select()
       .from('profiles')
       .where({ id })
@@ -27,7 +24,7 @@ module.exports = {
       throw new Error('[ERROR] Inexisting profile');
     }
 
-    const counterInUse = await knex('users')
+    const counterInUse = await context.knex('users')
       .count('id', { as: 'counter' })
       .where({ profileId: id })
       .first();
@@ -35,17 +32,17 @@ module.exports = {
       throw new Error('[ERROR] Profile is being used');
     }
 
-    await knex('profiles')
+    await context.knex('profiles')
       .where({ id })
       .delete();
 
     return profile;
   },
 
-  async updateProfile(_, { filter, payload }) {
+  async updateProfile(_, { filter, payload }, context) {
     const { id } = filter;
 
-    const profile = await knex
+    const profile = await context.knex
       .select()
       .from('profiles')
       .where({ id })
@@ -58,7 +55,7 @@ module.exports = {
       name: payload.name ?? profile.name,
     });
 
-    await knex('profiles')
+    await context.knex('profiles')
       .where({ id })
       .update(updatedProfile);
 

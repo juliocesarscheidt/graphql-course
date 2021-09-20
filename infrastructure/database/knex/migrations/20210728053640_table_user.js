@@ -1,24 +1,3 @@
-const users = [];
-// const users = [
-//   {
-//     name: 'user001',
-//     email: 'user001@email',
-//     password: '',
-//     age: 25,
-//     logged: true,
-//     profileId: 1,
-//     status: 'ACTIVE',
-//   }, {
-//     name: 'user002',
-//     email: 'user002@email',
-//     password: '',
-//     age: 75,
-//     logged: true,
-//     profileId: 2,
-//     status: 'INACTIVE',
-//   },
-// ];
-
 exports.up = (knex) => {
   return knex.schema.createTable('users', table => {
     table.increments('id').primary();
@@ -34,10 +13,6 @@ exports.up = (knex) => {
   }).alterTable('users', table => {
     table.foreign(['profileId']).references('id').inTable('profiles');
   });
-
-  // }).then(() => {
-  //   return knex('users').insert(users);
-  // })
 };
 
 exports.down = (knex) => {

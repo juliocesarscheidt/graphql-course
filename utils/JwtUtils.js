@@ -1,36 +1,35 @@
 const jwt = require('jwt-simple');
-const resolvers = require('../resolvers/user');
+const authSecret = process.env?.APP_AUTH_SECRET;
 
-const getUserToken = async (user) => {
-  const profile = await resolvers.profile(user);
+const env = process.env?.NODE_ENV || 'development';
+const knex = require('../infrastructure/database/knex/config/config')(env);
+
+const generateUserToken = async (user) => {
+  const profile = await knex
+      .select(['id', 'name', 'createdAt'])
+      .from('profiles')
+      .where({ id: user.profileId })
+      .first();
+
   const now = Math.floor(Date.now() / 1000);
   const exp = 1 * 24 * 60 * 60; // 1 day
 
-  const userInfo = {
+  const userPayload = {
     id: user.id,
     name: user.name,
     email: user.email,
-    // password: user.password,
-    // age: user.age,
-    // logged: user.logged,
     profileId: user.profileId,
     profile: profile,
-    // status: user.status,
-    // createdAt: user.createdAt,
     iat: now,
     exp: now + exp,
   };
 
-  console.log('userInfo', userInfo); // eslint-disable-line
-
-  const authSecret = process.env.APP_AUTH_SECRET;
-
   return {
-    ...userInfo,
-    token: jwt.encode(userInfo, authSecret)
+    ...userPayload,
+    token: jwt.encode(userPayload, authSecret)
   };
 };
 
 module.exports = {
-  getUserToken,
+  generateUserToken,
 }
