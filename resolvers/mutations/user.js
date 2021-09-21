@@ -19,6 +19,10 @@ const mutations = {
   },
 
   async createUser(_, { payload }, context) {
+    if (context) {
+      context.validateAdmin();
+    }
+
     const { name, email, password, age } = payload;
     let { profileId } = payload;
 
@@ -72,6 +76,10 @@ const mutations = {
   },
 
   async deleteUser(_, { filter }, context) {
+    if (context) {
+      context.validateAdmin();
+    }
+
     const { id, email } = filter;
 
     let user = null;
@@ -109,6 +117,11 @@ const mutations = {
   },
 
   async updateUser(_, { filter, payload }, context) {
+    // non admin users can only update themselves
+    if (context) {
+      context.validateUserFilter(filter);
+    }
+
     const { id, email } = filter;
 
     let user = null;
@@ -136,17 +149,33 @@ const mutations = {
 
     // check if this email is already being used by another user
     if (payload.email) {
-      const counterExistingEmail = await context.knex('users')
-        .count('id', { as: 'counter' })
-        .where({ email: payload.email })
-        .andWhere(context.knex.raw('id != ?', [id]))
-        .first();
-      if (counterExistingEmail.counter > 0) {
+      let counterExistingEmail = {};
+      if (id) {
+        counterExistingEmail = await context.knex('users')
+          .count('id', { as: 'counter' })
+          .where({ email: payload.email })
+          .andWhere(context.knex.raw('id != ?', [id]))
+          .first();
+
+      } else if (payload.email !== email) {
+        counterExistingEmail = await context.knex('users')
+          .count('id', { as: 'counter' })
+          .where({ email: payload.email })
+          .first();
+      }
+
+      if (counterExistingEmail?.counter > 0) {
         throw new Error('[ERROR] Duplicated email');
       }
     }
-    // check if profile exists
+
     if (payload.profileId) {
+      // only admin can set profiles
+      if (!context?.admin && payload.profileId !== user.profileId) {
+        throw new Error('[ERROR] Non admin user cannot change their own profile');
+      }
+
+      // check if profile exists
       const counterExistingProfile = await context.knex('profiles')
         .count('id', { as: 'counter' })
         .where({ id: payload.profileId })

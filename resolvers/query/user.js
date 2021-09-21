@@ -24,8 +24,12 @@ module.exports = {
     return generateUserToken(user);
   },
 
-  // first parameter of the resolver is the object itself
   async user(_, { filter }, context) {
+    // non admin users can only see themselves
+    if (context) {
+      context.validateUserFilter(filter);
+    }
+
     const { id, email } = filter;
     let user = null;
 
@@ -48,6 +52,10 @@ module.exports = {
   },
 
   users(_, args, context) {
+    if (context) {
+      context.validateAdmin();
+    }
+
     return context.knex
       .select()
       .from('users');

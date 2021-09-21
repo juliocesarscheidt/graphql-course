@@ -12,8 +12,8 @@ const context = async ({ req }) => {
   // inject token into req.headers.authorization;
   await getAuthenticatedUser(req);
 
-  const auth = req.headers.authorization;
-  const token = auth.replace('Bearer ', '');
+  const auth = req?.headers?.authorization;
+  const token = auth && auth.replace('Bearer ', '');
 
   let user = null;
   let admin = false;
@@ -37,10 +37,23 @@ const context = async ({ req }) => {
     user,
     admin,
     validateUser() {
-      if (!user) throw new Error('Denied access');
+      if (!user) throw new Error('Access denied');
     },
     validateAdmin() {
-      if (!admin) throw new Error('Denied access');
+      if (!admin) throw new Error('Access denied');
+    },
+    validateUserFilter(filter) {
+      if (admin) return;
+
+      if (!user) throw new Error('Access denied');
+      if (!filter) throw new Error('Access denied');
+
+      const { id, email } = filter;
+      if (!id && !email) throw new Error('Access denied');
+
+      // common users can only change their own users
+      if (id && id !== user.id) throw new Error('Access denied');
+      if (email && email !== user.email) throw new Error('Access denied');
     },
   };
 }

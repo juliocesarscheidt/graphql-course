@@ -1,6 +1,10 @@
 module.exports = {
   // using payload input
   async createProfile(_, { payload }, context) {
+    if (context) {
+      context.validateAdmin();
+    }
+
     const { name } = payload;
 
     const [result] = await context.knex.insert({ name })
@@ -13,6 +17,10 @@ module.exports = {
   },
 
   async deleteProfile(_, { filter }, context) {
+    if (context) {
+      context.validateAdmin();
+    }
+
     const { id } = filter;
 
     const profile = await context.knex
@@ -40,6 +48,10 @@ module.exports = {
   },
 
   async updateProfile(_, { filter, payload }, context) {
+    if (context) {
+      context.validateAdmin();
+    }
+
     const { id } = filter;
 
     const profile = await context.knex

@@ -1,6 +1,10 @@
 
 module.exports = {
   profile(_, { id }, context) {
+    if (context) {
+      context.validateAdmin();
+    }
+
     return context.knex
       .select()
       .from('profiles')
@@ -8,7 +12,11 @@ module.exports = {
       .first();
   },
 
-  profiles(obj, args, context) {
+  profiles(_, args, context) {
+    if (context) {
+      context.validateAdmin();
+    }
+
     return context.knex
       .select()
       .from('profiles');
