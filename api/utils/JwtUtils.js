@@ -1,5 +1,5 @@
 const jwt = require('jwt-simple');
-const authSecret = process.env?.APP_AUTH_SECRET;
+const authSecret = process.env?.API_AUTH_SECRET;
 
 const env = process.env?.NODE_ENV || 'development';
 const knex = require('../infrastructure/database/knex/config/config')(env);

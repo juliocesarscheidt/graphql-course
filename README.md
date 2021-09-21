@@ -7,7 +7,7 @@ This is a tiny project to use GraphQL and its features, it is using Postgres as 
 ```bash
 # set variables
 export NODE_ENV="development"
-export APP_AUTH_SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+export API_AUTH_SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 
 # run postgres
 docker-compose up -d postgres
@@ -22,10 +22,15 @@ docker-compose run migrations \
 # run tests
 docker-compose run --entrypoint "yarn run test" migrations
 
-# run app
-docker-compose up --build -d app
-docker-compose logs -f app
+# run api
+docker-compose up --build -d api
+docker-compose logs -f api
 # running on http://localhost:4000/
+
+# run client
+docker-compose up --build -d client
+docker-compose logs -f client
+# running on http://localhost:8080/
 
 docker-compose config
 ```
