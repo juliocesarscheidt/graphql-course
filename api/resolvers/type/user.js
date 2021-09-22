@@ -1,10 +1,9 @@
+const { selectOneByFilter } = require('../../utils/QueryUtils');
+
 const resolvers = {
-  profile({ profileId }, args, context) {
-    return context.knex
-      .select(['id', 'name', 'createdAt'])
-      .from('profiles')
-      .where({ id: profileId })
-      .first();
+  profile({ profileId }, _, context) {
+    const fields = ['id', 'name', 'createdAt'];
+    return selectOneByFilter(context.knex, 'profiles', { id: profileId }, fields);
   },
 };
 

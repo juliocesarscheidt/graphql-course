@@ -1,6 +1,5 @@
 module.exports = (knex) => new Promise(async (resolve, reject) => {
   const makeRandom = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
-
   const rand = makeRandom(1000, 10000);
 
   try {
@@ -29,7 +28,6 @@ module.exports = (knex) => new Promise(async (resolve, reject) => {
     return resolve(true);
 
   } catch (error) {
-    console.error(err);
     return reject(err);
   }
 });

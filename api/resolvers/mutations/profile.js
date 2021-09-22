@@ -1,3 +1,5 @@
+const { selectOneByFilter, selectCountByFilter } = require('../../utils/QueryUtils');
+
 module.exports = {
   // using payload input
   async createProfile(_, { payload }, context) {
@@ -6,7 +8,6 @@ module.exports = {
     }
 
     const { name } = payload;
-
     const [result] = await context.knex.insert({ name })
       .into('profiles')
       .onConflict('name')
@@ -22,21 +23,12 @@ module.exports = {
     }
 
     const { id } = filter;
-
-    const profile = await context.knex
-      .select()
-      .from('profiles')
-      .where({ id })
-      .first();
+    const profile = await selectOneByFilter(context.knex, 'profiles', { id });
     if (!profile) {
       throw new Error('[ERROR] Inexisting profile');
     }
-
-    const counterInUse = await context.knex('users')
-      .count('id', { as: 'counter' })
-      .where({ profileId: id })
-      .first();
-    if (counterInUse.counter > 0) {
+    const counterProfileInUse = await selectCountByFilter(context.knex, 'users', { profileId: id });
+    if (counterProfileInUse > 0) {
       throw new Error('[ERROR] Profile is being used');
     }
 
@@ -53,16 +45,10 @@ module.exports = {
     }
 
     const { id } = filter;
-
-    const profile = await context.knex
-      .select()
-      .from('profiles')
-      .where({ id })
-      .first();
+    const profile = await selectOneByFilter(context.knex, 'profiles', { id });
     if (!profile) {
       throw new Error('[ERROR] Inexisting profile');
     }
-
     const updatedProfile = Object.assign(profile, {
       name: payload.name ?? profile.name,
     });

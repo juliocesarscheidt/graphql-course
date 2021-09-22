@@ -1,45 +1,10 @@
 const profiles = [];
-// const profiles = [
-//   {
-//     id: 1,
-//     name: 'Admin',
-//     createdAt: new Date(Date.now()).toISOString(),
-//   }, {
-//     id: 2,
-//     name: 'Manager',
-//     createdAt: new Date(Date.now()).toISOString(),
-//   },
-// ];
+const users = [];
 
 const nextIDProfiles = () => (Math.max(...profiles.map(({ id }) => id))) + 1;
 
 let idUsers = 1;
 const nextIDUsers = () => idUsers++;
-
-const users = [];
-// const users = [
-//   {
-//     id: nextIDUsers(),
-//     name: 'user001',
-//     email: 'user001@email',
-//     password: 'password',
-//     age: 25,
-//     logged: true,
-//     profileId: arrayMathUtils.randomBetween(1, profiles.length),
-//     status: 'ACTIVE',
-//     createdAt: new Date(Date.now()).toISOString(),
-//   }, {
-//     id: nextIDUsers(),
-//     name: 'user002',
-//     email: 'user002@email',
-//     password: 'password',
-//     age: 75,
-//     logged: true,
-//     profileId: arrayMathUtils.randomBetween(1, profiles.length),
-//     status: 'INACTIVE',
-//     createdAt: new Date(Date.now()).toISOString(),
-//   },
-// ];
 
 Array.prototype.filterByID = function(id) {
   const selected = this

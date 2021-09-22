@@ -1,19 +1,12 @@
 const { encryptPassword } = require('../../utils/EncryptionUtils');
+const { selectOneByFilter, selectCountByFilter, selectCountByFilterExtra } = require('../../utils/QueryUtils');
 
 const mutations = {
   registerUser(_, { payload }, context) {
     const { name, email, password, age } = payload;
-
     return mutations.createUser(
       _,
-      {
-        payload: {
-          name,
-          email,
-          password,
-          age,
-        }
-      },
+      { payload: { name, email, password, age } },
       context,
     );
   },
@@ -25,33 +18,22 @@ const mutations = {
 
     const { name, email, password, age } = payload;
     let { profileId } = payload;
-
     if (!password) {
       throw new Error('[ERROR] Missing password');
     }
 
-    const counterExistingEmail = await context.knex('users')
-      .count('id', { as: 'counter' })
-      .where({ email })
-      .first();
-    if (counterExistingEmail.counter > 0) {
+    const counterExistingEmail = await selectCountByFilter(context.knex, 'users', { email });
+    if (counterExistingEmail > 0) {
       throw new Error('[ERROR] Duplicated email');
     }
 
     if (!profileId) {
       // set "Common" profile
-      const profileCommon = await context.knex('profiles')
-        .select(['id'])
-        .where({ name: 'Common' })
-        .first();
+      const profileCommon = await selectOneByFilter(context.knex, 'profiles', { name: 'Common' }, ['id']);
       profileId = profileCommon.id;
-
     } else {
-      const counterExistingProfile = await context.knex('profiles')
-        .count('id', { as: 'counter' })
-        .where({ id: profileId })
-        .first();
-      if (counterExistingProfile.counter <= 0) {
+      const counterExistingProfile = await selectCountByFilter(context.knex, 'profiles', { id: profileId });
+      if (counterExistingProfile <= 0) {
         throw new Error('[ERROR] Inexisting profile');
       }
     }
@@ -79,39 +61,16 @@ const mutations = {
     if (context) {
       context.validateAdmin();
     }
-
     const { id, email } = filter;
+    const whereClause = id ? { id } : { email };
 
-    let user = null;
-
-    if (id) {
-      user = await context.knex
-        .select()
-        .from('users')
-        .where({ id })
-        .first();
-      if (!user) {
-        throw new Error('[ERROR] Inexisting user');
-      }
-
-      await context.knex('users')
-        .where({ id })
-        .delete();
-
-    } else if (email) {
-      user = await context.knex
-        .select()
-        .from('users')
-        .where({ email })
-        .first();
-      if (!user) {
-        throw new Error('[ERROR] Inexisting user');
-      }
-
-      await context.knex('users')
-        .where({ email })
-        .delete();
+    const user = await selectOneByFilter(context.knex, 'users', whereClause);
+    if (!user) {
+      throw new Error('[ERROR] Inexisting user');
     }
+    await context.knex('users')
+      .where(whereClause)
+      .delete();
 
     return user;
   },
@@ -121,50 +80,24 @@ const mutations = {
     if (context) {
       context.validateUserFilter(filter);
     }
-
     const { id, email } = filter;
+    const whereClause = id ? { id } : { email };
 
-    let user = null;
-
-    if (id) {
-      user = await context.knex
-        .select()
-        .from('users')
-        .where({ id })
-        .first();
-      if (!user) {
-        throw new Error('[ERROR] Inexisting user');
-      }
-
-    } else if (email) {
-      user = await context.knex
-        .select()
-        .from('users')
-        .where({ email })
-        .first();
-      if (!user) {
-        throw new Error('[ERROR] Inexisting user');
-      }
+    const user = await selectOneByFilter(context.knex, 'users', whereClause);
+    if (!user) {
+      throw new Error('[ERROR] Inexisting user');
     }
 
     // check if this email is already being used by another user
     if (payload.email) {
-      let counterExistingEmail = {};
+      const emailFilter = { email: payload.email };
+      let counterExistingEmail = 0;
       if (id) {
-        counterExistingEmail = await context.knex('users')
-          .count('id', { as: 'counter' })
-          .where({ email: payload.email })
-          .andWhere(context.knex.raw('id != ?', [id]))
-          .first();
-
+        counterExistingEmail = await selectCountByFilterExtra(context.knex, 'users', emailFilter, context.knex.raw('id != ?', [id]));
       } else if (payload.email !== email) {
-        counterExistingEmail = await context.knex('users')
-          .count('id', { as: 'counter' })
-          .where({ email: payload.email })
-          .first();
+        counterExistingEmail = await selectCountByFilter(context.knex, 'users', emailFilter);
       }
-
-      if (counterExistingEmail?.counter > 0) {
+      if (counterExistingEmail > 0) {
         throw new Error('[ERROR] Duplicated email');
       }
     }
@@ -172,41 +105,28 @@ const mutations = {
     if (payload.profileId) {
       // only admin can set profiles
       if (!context?.admin && payload.profileId !== user.profileId) {
-        throw new Error('[ERROR] Non admin user cannot change their own profile');
+        throw new Error('[ERROR] Non admin users cannot change their profile');
       }
-
       // check if profile exists
-      const counterExistingProfile = await context.knex('profiles')
-        .count('id', { as: 'counter' })
-        .where({ id: payload.profileId })
-        .first();
-      if (counterExistingProfile.counter <= 0) {
+      const counterExistingProfile = await selectCountByFilter(context.knex, 'profiles', { id: payload.profileId });
+      if (counterExistingProfile <= 0) {
         throw new Error('[ERROR] Inexisting profile');
       }
-    }
-
-    if (payload.password) {
-      payload.password = encryptPassword(payload.password);
     }
 
     const updatedUser = Object.assign(user, {
       name: payload.name ?? user.name,
       email: payload.email ?? user.email,
-      password: payload.password ?? user.password,
       age: payload.age ?? user.age,
       profileId: payload.profileId ?? user.profileId,
     });
-
-    if (id) {
-      await context.knex('users')
-        .where({ id })
-        .update(updatedUser);
-
-    } else if (email) {
-        await context.knex('users')
-        .where({ email })
-        .update(updatedUser);
+    if (payload.password) {
+      updatedUser.password = encryptPassword(payload.password);
     }
+
+    await context.knex('users')
+      .where(whereClause)
+      .update(updatedUser);
 
     return updatedUser;
   },

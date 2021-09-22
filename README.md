@@ -78,15 +78,21 @@ query {
     id: 1
   }) { ...fullUserData }
 
-  # user(filter: {
-  #   email: "user001@email"
-  # }) { ...fullUserData }
+  user(filter: {
+    email: "user001@email"
+  }) { ...fullUserData }
 
   users { ...fullUserData }
 
   profile(id: 1) { ...fullProfileData }
 
-  # profiles { ...fullProfileData }
+  profiles { ...fullProfileData }
+
+  verifyToken(
+    payload: {
+      token: "BEARER_TOKEN"
+    }
+  ) { ...loginData }
 }
 ```
 

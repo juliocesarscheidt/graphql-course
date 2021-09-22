@@ -5,7 +5,7 @@ import { setContext } from 'apollo-link-context';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 
 Vue.use({
-  install(Vue) {
+  install() {
     // ApolloLink
     const httpLink = createHttpLink({
       uri: 'http://localhost:4000',

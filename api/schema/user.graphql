@@ -59,3 +59,7 @@ input FilterUserInput {
   id: Int
   email: String
 }
+
+input TokenData {
+  token: String!
+}

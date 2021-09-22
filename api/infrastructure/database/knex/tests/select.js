@@ -9,7 +9,6 @@ module.exports = (knex) => new Promise(async (resolve, reject) => {
       return resolve(true);
     })
     .catch(err => {
-      console.error(err);
       return reject(err);
     });
 });

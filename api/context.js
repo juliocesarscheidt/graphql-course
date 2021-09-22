@@ -1,17 +1,25 @@
-const jwt = require('jwt-simple');
-const authSecret = process.env?.API_AUTH_SECRET;
-
 const env = process.env?.NODE_ENV || 'development';
 const knex = require('./infrastructure/database/knex/config/config')(env);
 
-// const mockGetAuthenticatedUser = require('./infrastructure/mock/getAuthenticatedUser');
+const { decodeJwtToken } = require('./utils/JwtUtils');
+
+const ADMIN_PROFILE_NAME = 'Admin';
+
+const validateUserFilter = (user, admin, filter) => {
+  if (admin) return;
+
+  if (!user) throw new Error('Access denied');
+  if (!filter) throw new Error('Access denied');
+
+  const { id, email } = filter;
+  if (!id && !email) throw new Error('Access denied');
+
+  // common users can only change their own users
+  if (id && id !== user.id) throw new Error('Access denied');
+  if (email && email !== user.email) throw new Error('Access denied');
+};
 
 const context = async ({ req }) => {
-  console.log('Context');
-
-  // inject token into req.headers.authorization;
-  // await mockGetAuthenticatedUser(req);
-
   const auth = req?.headers?.authorization;
   const token = auth && auth.replace('Bearer ', '');
 
@@ -19,16 +27,10 @@ const context = async ({ req }) => {
   let admin = false;
 
   if (token) {
-    try {
-      const userPayload = jwt.decode(token, authSecret);
-
-      if (new Date(userPayload.exp * 1000) > new Date()) {
-        user = userPayload;
-        admin = user.profile && user.profile.name === 'Admin';
-      }
-
-    } catch (exception) {
-      console.error('exception', exception);
+    const tokenDecoded = decodeJwtToken(token);
+    if (tokenDecoded) {
+      user = tokenDecoded;
+      admin = user?.profile?.name === ADMIN_PROFILE_NAME;
     }
   }
 
@@ -43,17 +45,7 @@ const context = async ({ req }) => {
       if (!admin) throw new Error('Access denied');
     },
     validateUserFilter(filter) {
-      if (admin) return;
-
-      if (!user) throw new Error('Access denied');
-      if (!filter) throw new Error('Access denied');
-
-      const { id, email } = filter;
-      if (!id && !email) throw new Error('Access denied');
-
-      // common users can only change their own users
-      if (id && id !== user.id) throw new Error('Access denied');
-      if (email && email !== user.email) throw new Error('Access denied');
+      validateUserFilter(user, admin, filter);
     },
   };
 }

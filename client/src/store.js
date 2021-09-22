@@ -24,7 +24,6 @@ export default new Vuex.Store({
       } else {
         localStorage.removeItem('token');
       }
-
       commit('setUser', user);
     }
   }

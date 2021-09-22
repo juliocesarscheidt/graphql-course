@@ -5,6 +5,7 @@ scalar Date
 # "!" is to make this parameters mandatory
 type Query {
   login(payload: UserDataLoginInput!): UserAuthenticationData
+  verifyToken(payload: TokenData!): UserAuthenticationData
   user(filter: FilterUserInput!): User
   users: [User]!
   profile(id: Int): Profile
